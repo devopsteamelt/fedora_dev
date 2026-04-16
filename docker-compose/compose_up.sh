@@ -19,10 +19,11 @@ fi
 
 
 cat << EOF > personal.env
-rt_image=zeevb053/fedora-dev:14.07
+rt_image=zeevb053/fedora-dev:14.08
 app_ip=$app_ip
 EOF
 
 
 
-docker compose -f $compose_file --env-file personal.env up
+#docker compose -f $compose_file --env-file personal.env up
+podman compose -f $compose_file --env-file personal.env up

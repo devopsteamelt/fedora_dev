@@ -3,126 +3,79 @@ FROM zeevb/dev_docker:C_14.02__gcc8.5 As GCC8.5-Image
 
 # ---------------------------------------------------
 
-FROM fedora:40
-
+#FROM fedora:40
+FROM docker.io/fedora:43
 USER 0
 
 COPY --from=GCC8.5-Image /usr/local/gcc/gcc8.5 /usr/local/gcc/gcc8.5
 
 #ARG CMAKE_VERSION=3.26.0
-ARG GTEST_VERSION=1.15.2
-ARG BOOST_VERSION_DOT=1.86.0
-ARG BOOST_VERSION_UNDERSCORE=1_86_0
-ARG BENCHMARK_VERSION=1.9.0
+ARG GTEST_VERSION=1.17.0
+ARG BOOST_VERSION_DOT=1.90.0
+ARG BOOST_VERSION_UNDERSCORE=1_90_0
+ARG BENCHMARK_VERSION=1.9.5
+
+ENV PIP_NO_CACHE_DIR=1
+
 #ENV NODE_EXTRA_CA_CERTS=/etc/ca-bundle.crt
 #ENV REQUESTS_CA_BUNDLE=/etc/ca-bundle.crt
 #ENV SSL_CERT_FILE=/etc/ca-bundle.crt
 
-LABEL name="fedora40" \
+LABEL name="fedora43" \
 	  GoogleTestVersion="$GTEST_VERSION" \
 	  BoostVersion="$BOOST_VERSION_DOT" \
 	  #CMakeVersion="$CMAKE_VERSION" \
 	  BenchmarkVersion="$BENCHMARK_VERSION"
 
-# ADD https://netfree.link/dl/unix-ca.sh /home/netfree-unix-ca.sh 
-RUN curl  https://netfree.link/dl/unix-ca.sh | sh && update-ca-trust   
+
+RUN (curl -k https://files.devops.elta.co.il/scripts/addEltaCert.sh | sh) || true && \
+    curl  https://netfree.link/dl/unix-ca.sh | sh && \
+	update-ca-trust   
  
 
-RUN dnf -y clean all; dnf -y update ; dnf -y update --refresh  && \
+	RUN dnf -y clean all; dnf -y update ; dnf -y update --refresh  && \
+	dnf -y group install "c-development" "development-tools"  && \
+	dnf -y install gcc gcc-c++ make which && \
 	dnf -y install python3 python3-pip python3-devel	 && \
 	#
 	#
-	echo which python3: ; \ 
-	which python3 ; \ 
-	echo python3 --version ; \ 
-	python3 --version ; \ 
-	python3 -m pip install -U pip ; \ 
-	pip3 install wheel ; \
-	pip3 install twine ; \
-	pip3 install pytest-cov ; \
-	pip3 install pytest-spec ; \
-	pip3 install six ; \
-	pip3 install conan ; \
-	pip3 install rich ; \
-	pip3 install matplotlib ; \
-	pip3 install elasticsearch ; \
-	pip3 install selenium  ; \
-	pip3 install pika  ; \
-	pip3 install rticonnextdds-connector  ; \
-    pip3 install numpy==1.26.4  ; \
-	pip3 install junit-xml  ; \
-	pip3 install unittest2py3k  ; \
-	pip3 install unittest2  ; \
-	pip3 install unittest-xml-reporting  ; \
-	pip3 install pytest  ; \
-	pip3 install nose  ; \
-	pip3 install tox  ; \
-	pip3 install pandas  ; \
-	pip3 install xlrd  ; \
-	pip3 install jira  ; \
-	pip3 install debugpy  ; \
-	pip3 install docker  ; \
-	pip3 install kubernetes  ; \
-	# pip3 install docker-compose  ; \
-	pip3 install colorama  ; \
-	pip3 install gcovr  ; \
-	pip3 install junitparser  ; \
-	pip3 install colorlog  ; \
-	pip3 install plotly  ; \
-	pip3 install yq  ; \
-	pip3 install xq  ; \
-	pip3 install hq  ; \
-	pip3 install pick  ; \
-	pip3 install dominate  ; \
-	pip3 install python-git  ; \
-	pip3 install tk  ; \
-	pip3 install west  ; \
-	pip3 install mat4py  ; \
-	pip3 install matplotlib  ; \
-	pip3 install ipython  ; \
-	pip3 install jupyter  ; \
-	pip3 install sympy  ; \
-	pip3 install nose  ; \
-	pip3 install python-gitlab  ; \
-	pip3 install psutil  ; \
-	pip3 install flask  ; \
-	pip3 install gitlabber  ; \
-	# pip3 install conan-package-tools  ; \
-	pip3 install python-jenkins  ; \
-	pip3 install rtpy  ; \
-	pip3 install flake8  ; \
-	pip3 install python-engineio  ; \
-	pip3 install bidict  ; \
-	pip3 install socketio  ; \
-	pip3 install Flask-SocketIO  ; \
-	pip3 install mypy  ; \
-	pip3 install pytest-cov  ; \
-	pip3 install scipy ; \
-	pip3 install allure-pytest ; \
-	pip3 install ansible ; \
-	pip3 install tzdata ; \
-	pip3 install numa ; \
-	pip3 install openai ; \
-	pip3 install langchain ; \
-	pip3 install streamlit ; \
-	pip3 install TensorFlow ; \
-	pip3 install Keras ; \
-	pip3 install Seaborn ; \
-	pip3 install Scikit ; \
-	pip3 install Scikit-learn ; \
-	pip3 install Plotly ; \
-	pip3 install Matplotlib ; \
-	pip3 install PyTorch ; \
-	pip3 install Theano ; \
-	pip3 install gradio  ; \
-	pip3 install python-dotenv ; \
-	pip3 install Django Jinja2 Scrapy Requests Dash; \	
-	pip3 install git+https://github.com/rancher/client-python.git@master ; \
-	pip3 install pygccxml clang pycparser gitpython; \
-	pip3 install textual-serve textual-dev toolong faqtory tailless pytest-textual-snapshot declare; \
-	python3 -m pip install -U pip  && \
-    dnf -y group install "c-development" "development-tools"  && \
-    dnf -y install man man-pages man-db --setopt='tsflags=' 
+	echo which python3: ; \
+	which python3 ; \
+	echo python3 --version ; \
+	python3 --version ; \
+	python3 -m pip install -U pip && \
+	python3 -m pip install -U numpy && \
+	python3 -m pip install scipy && \
+	python3 -m pip install Scikit-learn && \
+	python3 -m pip install --prefer-binary "pandas>=2.3.3" && \
+	python3 -m pip install --prefer-binary streamlit && \
+	python3 -m pip install \
+    wheel twine pytest-cov pytest-spec six conan rich matplotlib elasticsearch \
+    "urllib3>=2.6.3,<3" selenium pika rticonnextdds-connector \
+    junit-xml unittest2py3k unittest2 unittest-xml-reporting pytest nose tox \
+    xlrd jira debugpy docker kubernetes colorama gcovr junitparser colorlog \
+    plotly yq xq hq pick dominate && \
+	python3 -m pip install \
+    tk west mat4py ipython jupyter sympy python-gitlab psutil \
+    flask gitlabber python-jenkins rtpy flake8 python-engineio bidict \
+    python-socketio Flask-SocketIO mypy allure-pytest ansible tzdata && \
+	python3 -m pip install \
+    openai langchain Seaborn gradio  \
+    toolong \
+    pytest-textual-snapshot declare && \
+	python3 -m pip install Requests && \
+	python3 -m pip install "pycparser>=2.22" && \
+	python3 -m pip install python-git && \
+	python3 -m pip install "GitPython>=3.1.46" && \
+	python3 -m pip install clang && \
+	python3 -m pip install pygccxml && \ 
+	python3 -m pip install python-dotenv && \
+	python3 -m pip install faqtory && \
+	python3 -m pip install git+https://github.com/rancher/client-python.git@master && \
+	python3 -m pip install -U pip && \
+    dnf -y install man man-pages man-db --setopt='tsflags=' && \
+	dnf clean all -y && \
+	rm -rf /var/cache/dnf /var/cache/yum /root/.cache/pip
 
 	#
 	# Prepare OneAPI repo
@@ -136,7 +89,7 @@ RUN \
 	# gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB >> /etc/yum.repos.d/oneAPI.repo ; \ 
 	#
 	# Install all packages
-    dnf -y install glibc libstdc++ libstdc++-docs libgcc glibc-langpack-en gcc gcc-c++ gdb sudo openssl openssl-devel net-tools bind-utils gdb-gdbserver ipcgull-devel\
+    dnf -y install glibc libstdc++ libstdc++-docs libgcc glibc-langpack-en gdb sudo openssl openssl-devel net-tools bind-utils gdb-gdbserver ipcgull-devel\
   	   tcpdump  \
 	   qt5-qtbase-devel \
 	   qt5-qtwebkit-devel libstdc++.i686 glibc.i686 \
@@ -154,13 +107,14 @@ RUN \
 	   isl-devel.x86_64 isl-devel.i686 isl.i686 isl.x86_64 gmp gmp-devel \
 	   mpfr  mpfr-devel libmpc libmpc-devel hwloc hwloc-devel hwloc-gui hwloc-plugins \
 	   memkind-devel pciutils-devel pciutils pciutils-devel-static pciutils-libs pcm \
-	   libgphobos-static gcc-gnat gcc-gdc glibc-devel.i686 dejagnu autogen npm conda && \
+	   libgphobos-static gcc-gnat gcc-gdc glibc-devel.i686 dejagnu autogen npm conda libpqxx libpqxx-devel wireshark-cli openmpi openmpi-devel && \
     # dnf -y --releasever=37 install kompose  && \
     dnf install -y ngrep hiera lsyncd sshpass lcov jq ccache lapack-devel dwarves  && \
     dnf install -y libasan libasan-static libatomic libatomic-static liblsan liblsan-static libtsan libtsan-static libubsan libubsan-static && \
 	#libhwasan libhwasan-static 
 	dnf update -y && \
     dnf clean all -y && \
+	rm -rf /var/cache/dnf /var/cache/yum && \
 	echo && \
 	echo Set gcc alternatives && \
 	alternatives --install /usr/local/bin/gcc gcc  /usr/bin/gcc 1 \
@@ -182,8 +136,8 @@ RUN echo "root:1" | chpasswd
 RUN pushd /tmp/ && \
 	mkdir kubectl && \ 
 	cd kubectl && \
-	curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
-	curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
+	curl -fLO --retry 5 --retry-delay 2 --http1.1 "https://dl.k8s.io/release/$(curl -fsSL --retry 5 --retry-delay 2 --http1.1 https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+	curl -fLO --retry 5 --retry-delay 2 --http1.1 "https://dl.k8s.io/$(curl -fsSL --retry 5 --retry-delay 2 https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
 	echo "$(<kubectl.sha256) kubectl" | sha256sum --check && \
 	install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
 	kubectl version --client && \
@@ -202,7 +156,7 @@ RUN pushd /tmp/ && \
     #rm -rf iperf-2.0.8-2.fc23.x86_64.rpm && \
     #yum clean all -y; \
 	wget https://github.com/rancher/cli/releases/download/v2.6.11/rancher-linux-amd64-v2.6.11.tar.gz -O - | \
-		tar xz && ls -las ; mv rancher-v2.6.11/rancher /usr/bin/rancher ; ls -lsa /usr/bin ; \
+		tar xz && ls -las ; mv rancher-v2.6.11/rancher /usr/bin/rancher ; rm -rf rancher-v2.6.11 ; ls -lsa /usr/bin ; \
 	popd
 #	wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64.tar.gz -O - | \
 #		tar xz && mv yq_linux_amd64 /usr/bin/yq ; ls -lsa /usr/bin ; \
@@ -304,10 +258,12 @@ RUN pushd /tmp/ && \
 # Install selenium
  RUN pushd /tmp/ && \
 	wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
+	rpm --import https://dl.google.com/linux/linux_signing_key.pub && \
 	dnf -y install ./google-chrome-stable_current_*.rpm && \
 #	yum -y install xorg-x11-server-Xvfb && \
     rm -rf google-chrome-stable_current_*.rpm && \
     dnf clean all -y  && \
+	rm -rf /var/cache/dnf /var/cache/yum && \
 	popd
 
 
@@ -393,4 +349,3 @@ EXPOSE 22
 
 # Set the default CMD to print the usage of the language image
 CMD ["/usr/bin/startSSH.sh"]
-

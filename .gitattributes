@@ -1,0 +1,4 @@
+*.sh text eol=lf
+root/root/etc/scl_enable text eol=lf
+root/usr/bin/container-entrypoint text eol=lf
+root/usr/bin/usage text eol=lf
