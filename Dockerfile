@@ -288,7 +288,7 @@ RUN mkdir -p /workspaces && \
     sed -i -e '0,/^\(%wheel\s\+.\+\)/s//#\1/' /etc/sudoers && \
 	useradd -G wheel kube && \
 	echo "kube:1" | chpasswd  && \
-    echo "kube ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    echo "kube ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
 	sed -i '/PubkeyAcceptedAlgorithms/s/$/,ssh-rsa/' /etc/crypto-policies/back-ends/opensshserver.config
 
 # USER 1000
