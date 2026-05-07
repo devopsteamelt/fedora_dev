@@ -61,7 +61,7 @@ RUN (curl -k https://files.devops.elta.co.il/scripts/addEltaCert.sh | sh) || tru
     python-socketio Flask-SocketIO mypy allure-pytest ansible tzdata && \
 	python3 -m pip install \
     openai langchain Seaborn gradio  \
-    toolong \
+    toolong pydantic rti.connext\
     pytest-textual-snapshot declare && \
 	python3 -m pip install Requests && \
 	python3 -m pip install "pycparser>=2.22" && \
@@ -70,7 +70,6 @@ RUN (curl -k https://files.devops.elta.co.il/scripts/addEltaCert.sh | sh) || tru
 	python3 -m pip install clang && \
 	python3 -m pip install pygccxml && \ 
 	python3 -m pip install python-dotenv && \
-	python3 -m pip install faqtory && \
 	python3 -m pip install git+https://github.com/rancher/client-python.git@master && \
 	python3 -m pip install -U pip && \
     dnf -y install man man-pages man-db --setopt='tsflags=' && \
