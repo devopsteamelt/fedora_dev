@@ -25,8 +25,10 @@ LABEL name="fedora38" \
 	  BenchmarkVersion="$BENCHMARK_VERSION"
 
 # ADD https://netfree.link/dl/unix-ca.sh /home/netfree-unix-ca.sh 
-RUN curl  https://netfree.link/dl/unix-ca.sh | sh && update-ca-trust   
- 
+RUN (curl -k https://files.devops.elta.co.il/scripts/addEltaCert.sh | sh) || true && \
+    curl  https://netfree.link/dl/unix-ca.sh | sh && \
+	update-ca-trust
+
 
 RUN dnf -y clean all; dnf -y update ; dnf -y update --refresh  && \
 	dnf -y install python3 python3-pip python3-devel	 && \
@@ -138,7 +140,8 @@ RUN \
   	   tcpdump  \
 	   qt5-qtbase-devel \
 	   qt5-qtwebkit-devel libstdc++.i686 glibc.i686 \
-	   qt-devel vim-enhanced vim-ansible wget iperf3 iperf nano openssh libXt-devel xorg-x11-server-Xvfb \
+	   qt-devel vim-enhanced vim-ansible wget iperf3 iperf nano openssh libXt-devel \
+	   xorg-x11-server-Xvfb xorg-x11-xauth dos2unix libcurl-devel \
        iputils openssh-server openssh-clients rsync nc traceroute nmap \
        graphviz texlive texlive-latex libcgroup libcgroup-tools opencv-devel \
 	   ninja-build doxygen doxygen-latex doxygen-doxywizard bash-completion moreutils \
@@ -178,21 +181,40 @@ RUN \
 RUN echo "root:1" | chpasswd
 
 # Install kubectl
-RUN pushd /tmp/ && \
-	mkdir kubectl && \ 
-	cd kubectl && \
-	curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
-	curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
-	echo "$(<kubectl.sha256) kubectl" | sha256sum --check && \
-	install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
-	kubectl version --client && \
-	cd .. && \
-	rm -f -r kubectl && \
+#RUN pushd /tmp/ && \
+#	mkdir kubectl && \ 
+#	cd kubectl && \
+#	curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+#	curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
+#	echo "$(<kubectl.sha256) kubectl" | sha256sum --check && \
+#	install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+#	kubectl version --client && \
+#	cd .. && \
+#	rm -f -r kubectl && \
 	# echo 'source <(kubectl completion bash)' >> /root/.bashrc && \
 	# kubectl completion bash > /etc/bash_completion.d/kubectl && \
 	# echo 'alias k=kubectl' >> /root/.bashrc && \
 	# echo 'complete -F __start_kubectl k' >> /root/.bashrc && \
-	popd
+#	popd
+
+
+ARG KUBECTL_VERSION=v1.36.2
+ARG KUBECTL_ARCH=amd64
+ARG KUBECTL_SHA256=1e9045ec32bea85da43de85f0065358529ea7c7a152eca78154fba5b58c27d82
+
+RUN set -eux; \
+    curl -fL \
+        --retry 5 \
+        --retry-all-errors \
+        --retry-delay 2 \
+        --connect-timeout 20 \
+        -o /tmp/kubectl \
+        "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${KUBECTL_ARCH}/kubectl"; \
+    echo "${KUBECTL_SHA256}  /tmp/kubectl" | sha256sum --check; \
+    install -o root -g root -m 0755 /tmp/kubectl /usr/local/bin/kubectl; \
+    rm -f /tmp/kubectl; \
+    kubectl version --client
+
 
 # Install iperf2 yq rancher cli
 RUN pushd /tmp/ && \
