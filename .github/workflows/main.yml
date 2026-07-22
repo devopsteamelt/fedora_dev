@@ -28,11 +28,11 @@ jobs:
           run: |
             docker build . \
               --file Dockerfile \
-              --tag ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:$GITHUB_REF_NAME \
-              --tag ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:latest
+              --tag ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora-dev:$GITHUB_REF_NAME \
+              --tag ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora-dev:latest
     
         # דחיפה (Push) של האימג' ל-Docker Hub
         - name: Push Docker image
           run: |
-            docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:$GITHUB_REF_NAME
-            docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:latest
+            docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora-dev:$GITHUB_REF_NAME
+            docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora-dev:latest
