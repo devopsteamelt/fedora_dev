@@ -32,5 +32,5 @@ jobs:
         # דחיפה (Push) של האימג' ל-Docker Hub
         - name: Push Docker image
           run: |
-            #docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:$GITHUB_REF_NAME
-            #docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_ev:latest
+            docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:$GITHUB_REF_NAME
+            docker push ${{ secrets.DEVOPS_TEAM_USERNAME }}/fedora_dev:latest
