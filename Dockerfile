@@ -89,6 +89,7 @@ RUN \
 	#
 	# Install all packages
     dnf -y install glibc libstdc++ libstdc++-docs libgcc glibc-langpack-en gdb sudo openssl openssl-devel net-tools bind-utils gdb-gdbserver ipcgull-devel\
+	   curl-devel \
   	   tcpdump  \
 	   qt5-qtbase-devel \
 	   qt5-qtwebkit-devel libstdc++.i686 glibc.i686 \
