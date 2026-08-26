@@ -159,7 +159,7 @@ RUN \
 #	   tbb-bind - don't exist in fedoroa 38
     # dnf -y --releasever=37 install kompose  && \
     dnf install -y ngrep hiera lsyncd sshpass lcov jq ccache lapack-devel dwarves  && \
-    dnf install -y libasan libasan-static libatomic libatomic-static liblsan liblsan-static libtsan libtsan-static libubsan libubsan-static && \
+    dnf install -y libasan libasan-static libatomic libatomic-static liblsan liblsan-static libtsan libtsan-static libubsan libubsan-static git-lfs && \
 	#libhwasan libhwasan-static 
 	dnf update -y && \
     dnf clean all -y && \
